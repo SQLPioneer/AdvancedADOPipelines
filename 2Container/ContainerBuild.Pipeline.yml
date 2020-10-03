@@ -1,0 +1,31 @@
+resources:
+  containers:
+  - container: mssql
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    ports: 
+    # - 1433
+    - 1433:1433
+    options: -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' -e 'MSSQL_PID=Express'
+
+stages:
+- stage: DBBuild  
+  jobs:
+  - job: unit_test_db_mssql
+    # condition: eq('${{ variables.runDbTests }}', 'true')
+    continueOnError: true
+    pool:
+      vmImage: 'ubuntu-16.04'
+    services:
+      localhostsqlserver: mssql
+    steps:
+    - task: PowerShell@2
+      displayName: 'delay 10'
+      inputs:
+        targetType: 'inline'
+        script: |
+          start-sleep -s 10
+    - task: Bash@3
+        inputs:
+        targetType: 'inline'
+        script: 'env | sort'
+        echo ${{ agent.services.localhostsqlserver.ports.1433 }}
