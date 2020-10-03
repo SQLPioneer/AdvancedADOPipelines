@@ -24,8 +24,9 @@ stages:
         targetType: 'inline'
         script: |
           start-sleep -s 10
+
     - task: Bash@3
-        inputs:
+      inputs:
         targetType: 'inline'
-        script: 'env | sort'
-        echo ${{ agent.services.localhostsqlserver.ports.1433 }}
+        script: 'env | sort
+        echo ${{ agent.services.localhostsqlserver.ports.1433 }}'
