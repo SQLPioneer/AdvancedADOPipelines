@@ -2,10 +2,13 @@ resources:
   containers:
   - container: mssql
     image: mcr.microsoft.com/mssql/server:2017-latest
+    env:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Password123
+      MSSQL_PID: Express
     ports: 
-    # - 1433
-    - 1433:1433
-    options: -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' -e 'MSSQL_PID=Express'
+      - 1433:1433
+    options: --name mssql
 
 stages:
 - stage: DBBuild  
@@ -16,10 +19,10 @@ stages:
     pool:
       vmImage: 'ubuntu-16.04'
     services:
-      localhostsqlserver: mssql
+      mssql: mssql
     steps:
     - task: PowerShell@2
-      displayName: 'delay 10'
+      displayName: 'Sleep'
       inputs:
         targetType: 'inline'
         script: |
@@ -34,7 +37,10 @@ stages:
         script: 'docker ps -all'
     - task: CmdLine@2
       inputs:
-        script: 'sqlcmd -S localhost -d master -U sa -P "SA_PASSWORD=yourStrong(!)Password" -Q "SELECT @@version;"'
+        script: 'docker logs mssql'
+    - task: CmdLine@2
+      inputs:
+        script: 'sqlcmd -S localhost -d master -U sa -P Password123 -Q "SELECT @@version;"'
 #    - task: Bash@3
 #      inputs:
 #        targetType: 'inline'
