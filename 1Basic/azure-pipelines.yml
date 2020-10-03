@@ -28,12 +28,17 @@ steps:
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\1Basic\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-- powershell: dir $(Build.SourcesDirectory)/1Basic/PipelinesProject/bin/Release -s
+- powershell: dir $(Build.SourcesDirectory)/1Basic -s
 - task: VSTest@2
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '**/TEST-*.xml'
+    mergeTestResults: true
+#    failTaskOnFailedTests: true
 - task: PublishBuildArtifacts@1
   displayName: PublishDatabase
   inputs:
@@ -41,10 +46,4 @@ steps:
     ArtifactName: 'SchoolProjectDB'
     publishLocation: 'Container'
 
-- task: PublishBuildArtifacts@1
-  displayName: PublishApp
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)/1Basic/PipelinesProject/bin/Release/netcoreapp3.1/'
-    ArtifactName: 'PipelinesProject'
-    publishLocation: 'Container'
     
