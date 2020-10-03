@@ -23,7 +23,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          start-sleep -s 10
+          start-sleep -s 60
 
     - task: Bash@3
       inputs:
