@@ -32,3 +32,18 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: PublishBuildArtifacts@1
+  displayName: PublishDatabase
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)/SchoolProject/bin/Release/'
+    ArtifactName: 'SchoolProjectDB'
+    publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  displayName: PublishApp
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)/PipelinesProject/bin/Release/netcoreapp3.1/'
+    ArtifactName: 'PipelinesProject'
+    publishLocation: 'Container'
+    
