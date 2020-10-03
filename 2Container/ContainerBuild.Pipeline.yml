@@ -29,13 +29,13 @@ stages:
       inputs:
         targetType: 'inline'
         script: 'env | sort'
-    - task: Bash@3
-      inputs:
-        targetType: 'inline'
-        script: 'echo ${{ AGENT_SERVICES_LOCALHOSTSQLSERVER_PORTS_1433 }}'
     - task: CmdLine@2
       inputs:
         script: 'docker ps -all'
     - task: CmdLine@2
       inputs:
         script: 'sqlcmd -S localhost -d master -U sa -P SA_PASSWORD=yourStrong(!)Password -Q "SELECT @@version;"'
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: 'echo ${{ AGENT_SERVICES_LOCALHOSTSQLSERVER_PORTS_1433 }}'
