@@ -29,6 +29,21 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 - powershell: dir $(Build.SourcesDirectory)/1Basic -s
+
+
+- task: SqlDacpacDeploymentOnMachineGroup@0
+  inputs:
+    TaskType: 'dacpac'
+    DacpacFile: 'SchoolProjectDB.dacpac'
+    TargetMethod: 'server'
+    ServerName: 'localhost'
+    DatabaseName: 'SchoolProjectDB'
+    AuthScheme: 'windowsAuthentication'
+- task: CmdLine@2
+  inputs:
+    script: 'sqlcmd -S localhost -d SchoolProjectDB -U sa -P Password123 -Q "SELECT @@version;"'
+
+
 - task: VSTest@2
   inputs:
     platform: '$(buildPlatform)'
