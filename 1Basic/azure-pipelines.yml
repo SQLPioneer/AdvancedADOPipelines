@@ -34,7 +34,7 @@ steps:
 - task: SqlDacpacDeploymentOnMachineGroup@0
   inputs:
     TaskType: 'dacpac'
-    DacpacFile: '\1Basic\SchoolProject\bin\Release\SchoolProject.dacpac'
+    DacpacFile: '$(build.artifactStagingDirectory)\1Basic\SchoolProject\bin\Release\SchoolProject.dacpac'
     TargetMethod: 'server'
     ServerName: 'localhost'
     DatabaseName: 'SchoolProjectDB'
