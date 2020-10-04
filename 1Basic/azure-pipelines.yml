@@ -25,7 +25,7 @@ variables:
 stages:
 - stage: DBBuild
   pool:
-   vmImage: 'ubuntu-16.04'
+   vmImage: 'windows-latest'
   jobs:
   - job: Build
     steps:
