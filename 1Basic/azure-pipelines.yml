@@ -24,6 +24,7 @@ variables:
 
 stages:
 - stage: DBBuild  
+  dependsOn: ''
   jobs:
   - job: Build
     continueOnError: true
