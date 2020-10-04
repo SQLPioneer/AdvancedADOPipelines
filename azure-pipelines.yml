@@ -12,10 +12,10 @@ pool:
 variables:
   ServerInstance: 'localhost'
   Query: "select @@servername as ServerName"
-
 steps:
 - task: PowerShell@2
   displayName: QueryLocalhost
   inputs:
+    targetType: 'inline'
     script: 'invoke-sqlcmd -ServerInstance localhost -Query "select @@servername as ServerName"'
     
