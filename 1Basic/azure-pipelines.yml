@@ -28,8 +28,6 @@ stages:
    vmImage: 'ubuntu-16.04'
   jobs:
   - job: Build
-    pool:
-      vmImage: 'ubuntu-16.04'
     steps:
     - task: NuGetToolInstaller@1
     - task: NuGetCommand@2
@@ -59,10 +57,10 @@ stages:
         publishLocation: 'Container'
 
 - stage: 
+  dependsOn: DBBuild
   jobs:
   - job: unit_test_db_mssql
     continueOnError: true
-    dependsOn: DBBuild
     pool:
       vmImage: 'ubuntu-16.04'
     services:
