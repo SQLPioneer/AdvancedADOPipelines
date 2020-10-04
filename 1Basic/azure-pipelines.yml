@@ -1,0 +1,91 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+resources:
+  containers:
+  - container: mssql
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    env:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Password123
+      MSSQL_PID: Express
+    ports: 
+      - 1433:1433
+    options: --name mssql
+
+trigger:
+- master
+
+variables:
+  solution: '1Basic\PipelinesSolution.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+stages:
+- stage: DBBuild
+  pool:
+   vmImage: 'windows-latest'
+  jobs:
+  - job: Build
+    steps:
+    - task: NuGetToolInstaller@1
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(solution)'
+    - task: powershell@2
+      displayName: DirectoryList
+      inputs:
+        targetType: inline
+        script: dir -s
+    - task: VSBuild@1
+      inputs:
+        solution: '$(solution)'
+        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\1Basic\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+    - task: powershell@2
+      displayName: DirectoryList_1Basic
+      inputs:
+        targetType: inline
+        script: dir $(Build.SourcesDirectory)/1Basic -s
+    - task: PublishBuildArtifacts@1
+      displayName: PublishDatabase
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/1Basic/SchoolProject/bin/Release/'
+        ArtifactName: 'SchoolProjectDB'
+        publishLocation: 'Container'
+
+- stage: 
+  dependsOn: DBBuild
+  jobs:
+  - job: unit_test_db_mssql
+    continueOnError: true
+    pool:
+      vmImage: 'ubuntu-16.04'
+    services:
+      mssql: mssql
+    steps:
+    - task: SqlDacpacDeploymentOnMachineGroup@0
+      inputs:
+        TaskType: 'dacpac'
+        DacpacFile: '$(Build.SourcesDirectory)/1Basic/SchoolProject/bin/Release/SchoolProject.dacpac'
+        TargetMethod: 'server'
+        ServerName: 'localhost'
+        DatabaseName: 'SchoolProjectDB'
+        AuthScheme: 'windowsAuthentication'
+    - task: CmdLine@2
+      inputs:
+        script: 'sqlcmd -S localhost -d SchoolProjectDB -U sa -P Password123 -Q "SELECT @@version;"'
+    - task: VSTest@2
+      inputs:
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/TEST-*.xml'
+        mergeTestResults: true
+    #    failTaskOnFailedTests: true
+
+        

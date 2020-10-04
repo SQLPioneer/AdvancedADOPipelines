@@ -1,0 +1,47 @@
+resources:
+  containers:
+  - container: mssql
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    env:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Password123
+      MSSQL_PID: Express
+    ports: 
+      - 1433:1433
+    options: --name mssql
+
+stages:
+- stage: DBBuild  
+  jobs:
+  - job: unit_test_db_mssql
+    # condition: eq('${{ variables.runDbTests }}', 'true')
+    continueOnError: true
+    pool:
+      vmImage: 'ubuntu-16.04'
+    services:
+      mssql: mssql
+    steps:
+    - task: PowerShell@2
+      displayName: 'Sleep'
+      inputs:
+        targetType: 'inline'
+        script: |
+          start-sleep -s 60
+
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: 'env | sort'
+    - task: CmdLine@2
+      inputs:
+        script: 'docker ps -all'
+    - task: CmdLine@2
+      inputs:
+        script: 'docker logs mssql'
+    - task: CmdLine@2
+      inputs:
+        script: 'sqlcmd -S localhost -d master -U sa -P Password123 -Q "SELECT @@version;"'
+#    - task: Bash@3
+#      inputs:
+#        targetType: 'inline'
+#        script: 'echo ${{ AGENT_SERVICES_LOCALHOSTSQLSERVER_PORTS_1433 }}'
