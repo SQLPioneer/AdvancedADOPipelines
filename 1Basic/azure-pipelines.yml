@@ -23,11 +23,11 @@ variables:
   buildConfiguration: 'Release'
 
 stages:
-- stage: DBBuild  
-  dependsOn: ''
+- stage: DBBuild
+  pool:
+   vmImage: 'ubuntu-16.04'
   jobs:
   - job: Build
-    continueOnError: true
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
