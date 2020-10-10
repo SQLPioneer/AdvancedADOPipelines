@@ -21,20 +21,16 @@ stages:
     services:
       mssql: mssql
     steps:
-    - task: Bash@3
-      displayName: "install sqlpackage"
-      inputs:
-        targetType: 'inline'
-        script: 'wget -progress=bar:force -q -O sqlpackage.zip https://go.microsoft.com/fwlink/?linkid=873926 \
-unzip -qq sqlpackage.zip -d /opt/sqlpackage \
-chmod +x /opt/sqlpackage/sqlpackage'
+    - script: |
+        wget -progress=bar:force -q -O sqlpackage.zip https://go.microsoft.com/fwlink/?linkid=873926
+        unzip -qq sqlpackage.zip -d /opt/sqlpackage 
+        chmod +x /opt/sqlpackage/sqlpackage
     - task: PowerShell@2
       displayName: 'Sleep'
       inputs:
         targetType: 'inline'
         script: |
           start-sleep -s 60
-
     - task: Bash@3
       displayName: "List Environment Variables"
       inputs:
