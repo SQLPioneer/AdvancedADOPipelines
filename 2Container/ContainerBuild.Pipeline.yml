@@ -4,7 +4,7 @@ resources:
     image: mcr.microsoft.com/mssql/server:2017-latest
     env:
       ACCEPT_EULA: Y
-      SA_PASSWORD: $saPassword
+      SA_PASSWORD: $(saPassword)
       MSSQL_PID: Express
     ports: 
       - 1433:1433
@@ -40,7 +40,7 @@ stages:
         script: 'docker logs mssql'
     - task: CmdLine@2
       inputs:
-        script: 'sqlcmd -S localhost -d master -U sa -P $saPassword -Q "SELECT @@version;"'
+        script: 'sqlcmd -S localhost -d master -U sa -P $(saPassword) -Q "SELECT @@version;"'
 #    - task: Bash@3
 #      inputs:
 #        targetType: 'inline'
