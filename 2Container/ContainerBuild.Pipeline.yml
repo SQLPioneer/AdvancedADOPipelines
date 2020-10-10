@@ -80,4 +80,4 @@ stages:
         targetType: 'inline'
         script: |
           ( /opt/mssql/bin/sqlservr & ) | grep -q "Service Broker manager has started"
-          /opt/sqlpackage/sqlpackage /a:Publish /tsn:. /tdn:$(DBNAME) /tu:sa /tp:$(saPassword)/sf:/tmp/$(DAC)
+          /opt/sqlpackage/sqlpackage /sf:$(Pipeline.Workspace)/1Basic/SchoolProjectDB/SchoolProject.dacpac /a:Publish /tsn:localhost /tdn:$(DBNAME) /tu:sa /tp:$(saPassword)
