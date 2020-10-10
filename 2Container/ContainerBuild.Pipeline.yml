@@ -13,50 +13,19 @@ resources:
     ports: 
       - 1433:1433
     options: --name mssql
+  pipelines:
+    - pipeline: 1Basic
+      source: SQLPioneer.PipelineDemo.1Basic
 
 trigger:
-- master
-
-variables:
-  solution: '1Basic\PipelinesSolution.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  paths:
+    include:
+      - 2Container/*
+    exclude:
+      - 1Basic/*
 
 stages:
-- stage: DBBuild
-  pool:
-   vmImage: 'windows-latest'
-  jobs:
-  - job: Build
-    steps:
-    - task: NuGetToolInstaller@1
-    - task: NuGetCommand@2
-      inputs:
-        restoreSolution: '$(solution)'
-    - task: powershell@2
-      displayName: DirectoryList
-      inputs:
-        targetType: inline
-        script: dir -s
-    - task: VSBuild@1
-      inputs:
-        solution: '$(solution)'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\1Basic\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-    - task: powershell@2
-      displayName: DirectoryList_1Basic
-      inputs:
-        targetType: inline
-        script: dir $(Build.SourcesDirectory)/1Basic -s
-    - task: PublishBuildArtifacts@1
-      displayName: PublishDatabase
-      inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/1Basic/SchoolProject/bin/Release/'
-        ArtifactName: 'SchoolProjectDB'
-        publishLocation: 'Container'
 - stage: deployToContainer
-  dependsOn: DBBuild
   jobs:
   - job: unit_test_db_mssql
     # condition: eq('${{ variables.runDbTests }}', 'true')
@@ -66,6 +35,7 @@ stages:
     services:
       mssql: mssql
     steps:
+    - download: 1Basic
     - task: Bash@3
       displayName: "List Environment Variables"
       inputs:
