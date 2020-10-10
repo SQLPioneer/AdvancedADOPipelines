@@ -23,6 +23,11 @@ trigger:
       - 2Container/*
     exclude:
       - 1Basic/*
+variables:
+- name: DAC
+  value: SchoolProject\SchoolProject.dacpac
+- name: DBNAME
+  value: SchoolProject
 
 stages:
 - stage: deployToContainer
@@ -37,19 +42,13 @@ stages:
     steps:
     - download: 1Basic
     - task: Bash@3
-      displayName: "List Environment Variables"
+      displayName: "Install sqlpackage"
       inputs:
         targetType: 'inline'
         script: |
           wget -progress=bar:force -q -O sqlpackage.zip https://go.microsoft.com/fwlink/?linkid=873926
           unzip -qq sqlpackage.zip -d /opt/sqlpackage 
           chmod +x /opt/sqlpackage/sqlpackage
-    - task: PowerShell@2
-      displayName: 'Sleep'
-      inputs:
-        targetType: 'inline'
-        script: |
-          start-sleep -s 60
     - task: Bash@3
       displayName: "List Environment Variables"
       inputs:
@@ -59,6 +58,13 @@ stages:
       displayName: "List docker images"
       inputs:
         script: 'docker ps -all'
+    - task: PowerShell@2
+      displayName: 'Sleep'
+      inputs:
+        targetType: 'inline'
+        script: |
+          dir -s
+          start-sleep -s 60
     - task: CmdLine@2
       displayName: "Show docker logs"
       inputs:
@@ -67,4 +73,10 @@ stages:
       displayName: "Connect to SQLServer and Query version" 
       inputs:
         script: 'sqlcmd -S localhost -d master -U sa -P $(saPassword) -Q "SELECT @@version;"'
-
+    - task: Bash@3
+      displayName: "Install sqlpackage"
+      inputs:
+        targetType: 'inline'
+        script: |
+          /opt/mssql/bin/sqlservr & ) | grep -q "Service Broker manager has started"
+          /opt/sqlpackage/sqlpackage /a:Publish /tsn:. /tdn:$(DBNAME) /tu:sa /tp:$(saPassword)/sf:/tmp/$(DAC)
