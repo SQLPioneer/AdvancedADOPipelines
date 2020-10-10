@@ -28,7 +28,8 @@ variables:
   value: SchoolProject\SchoolProject.dacpac
 - name: DBNAME
   value: SchoolProject
-
+- name: debug
+  value: true
 stages:
 - stage: deployToContainer
   jobs:
@@ -78,5 +79,5 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          /opt/mssql/bin/sqlservr & ) | grep -q "Service Broker manager has started"
+          ( /opt/mssql/bin/sqlservr & ) | grep -q "Service Broker manager has started"
           /opt/sqlpackage/sqlpackage /a:Publish /tsn:. /tdn:$(DBNAME) /tu:sa /tp:$(saPassword)/sf:/tmp/$(DAC)
