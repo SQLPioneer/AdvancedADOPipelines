@@ -75,9 +75,13 @@ stages:
       inputs:
         script: 'sqlcmd -S localhost -d master -U sa -P $(saPassword) -Q "SELECT @@version;"'
     - task: Bash@3
-      displayName: "Install sqlpackage"
+      displayName: "publish dacpac to container"
       inputs:
         targetType: 'inline'
         script: |
           ( /opt/mssql/bin/sqlservr & ) | grep -q "Service Broker manager has started"
           /opt/sqlpackage/sqlpackage /sf:$(Pipeline.Workspace)/1Basic/SchoolProjectDB/SchoolProject.dacpac /a:Publish /tsn:localhost /tdn:$(DBNAME) /tu:sa /tp:$(saPassword)
+    - task: CmdLine@2
+      displayName: "Connect to SQLServer and Query SchoolProject DB" 
+      inputs:
+        script: 'sqlcmd -S localhost -d SchoolProject -U sa -P $(saPassword) -Q "SELECT @@ServerName as ServerName, DB_NAME() AS CurrentDB;"' 
