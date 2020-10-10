@@ -2,17 +2,6 @@
 # Build and test ASP.NET Core projects targeting the full .NET Framework.
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-resources:
-  containers:
-  - container: mssql
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    env:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: Password123
-      MSSQL_PID: Express
-    ports: 
-      - 1433:1433
-    options: --name mssql
 
 trigger:
 - master
@@ -55,37 +44,3 @@ stages:
         PathtoPublish: '$(Build.SourcesDirectory)/1Basic/SchoolProject/bin/Release/'
         ArtifactName: 'SchoolProjectDB'
         publishLocation: 'Container'
-
-- stage: 
-  dependsOn: DBBuild
-  jobs:
-  - job: unit_test_db_mssql
-    continueOnError: true
-    pool:
-      vmImage: 'ubuntu-16.04'
-    services:
-      mssql: mssql
-    steps:
-    - task: SqlDacpacDeploymentOnMachineGroup@0
-      inputs:
-        TaskType: 'dacpac'
-        DacpacFile: '$(Build.SourcesDirectory)/1Basic/SchoolProject/bin/Release/SchoolProject.dacpac'
-        TargetMethod: 'server'
-        ServerName: 'localhost'
-        DatabaseName: 'SchoolProjectDB'
-        AuthScheme: 'windowsAuthentication'
-    - task: CmdLine@2
-      inputs:
-        script: 'sqlcmd -S localhost -d SchoolProjectDB -U sa -P Password123 -Q "SELECT @@version;"'
-    - task: VSTest@2
-      inputs:
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFormat: 'VSTest'
-        testResultsFiles: '**/TEST-*.xml'
-        mergeTestResults: true
-    #    failTaskOnFailedTests: true
-
-        
