@@ -29,19 +29,25 @@ stages:
           start-sleep -s 60
 
     - task: Bash@3
+      displayName: "List Environment Variables"
       inputs:
         targetType: 'inline'
         script: 'env | sort'
     - task: CmdLine@2
+      displayName: "List docker images"
       inputs:
         script: 'docker ps -all'
     - task: CmdLine@2
+      displayName: "Show docker logs"
       inputs:
         script: 'docker logs mssql'
     - task: CmdLine@2
+      displayName: "Connect to SQLServer and Query version" 
       inputs:
         script: 'sqlcmd -S localhost -d master -U sa -P $(saPassword) -Q "SELECT @@version;"'
-#    - task: Bash@3
-#      inputs:
-#        targetType: 'inline'
-#        script: 'echo ${{ AGENT_SERVICES_LOCALHOSTSQLSERVER_PORTS_1433 }}'
+    - task: Bash@3
+      displayName: "Update apt-get"
+      inputs:
+        script: 'RUN apt-get update \
+&& apt-get install unzip -y'
+
