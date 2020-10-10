@@ -4,7 +4,11 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- master
+  paths:
+    include:
+      - 1Basic/*
+    exclude:
+      - 2Container/*
 
 variables:
   solution: '1Basic\PipelinesSolution.sln'
