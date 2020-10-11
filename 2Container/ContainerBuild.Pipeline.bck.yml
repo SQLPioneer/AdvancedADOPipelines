@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 resources:
   containers:
-  - container: mssql2017
+  - container: mssql
     image: mcr.microsoft.com/mssql/server:2017-latest
     env:
       ACCEPT_EULA: Y
@@ -12,18 +12,7 @@ resources:
       MSSQL_PID: Express
     ports: 
       - 1433:1433
-    options: --name mssql2017
-    - container: mssql2019
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    env:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: $(saPassword)
-      MSSQL_PID: Express
-    ports: 
-      - 1433:1433
-    options: --name mssql2019
-  - container: test
-    image 
+    options: --name mssql
   pipelines:
     - pipeline: 1Basic
       source: SQLPioneer.PipelineDemo.1Basic
@@ -50,7 +39,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     services:
-      mssql: mssql2017
+      mssql: mssql
     steps:
     - download: 1Basic
     - task: Bash@3
