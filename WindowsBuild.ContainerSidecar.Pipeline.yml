@@ -68,11 +68,11 @@ stages:
         AuthScheme: 'sqlServerAuthentication'
         SqlUsername: 'sa'
         SqlPassword: '$(saPassword)'
-      - task: CmdLine@2
+    - task: CmdLine@2
       displayName: "Connect to SQLServer and Query version" 
       inputs:
         script: 'sqlcmd -S localhost -d master -U sa -P $(saPassword) -Q "SELECT @@version;"'
-      - task: CmdLine@2
+    - task: CmdLine@2
       displayName: "Connect to SQLServer and Query SchoolProject DB" 
       inputs:
         script: 'sqlcmd -S localhost -d SchoolProject -U sa -P $(saPassword) -Q "SELECT @@ServerName as ServerName, DB_NAME() AS CurrentDB;"' 
