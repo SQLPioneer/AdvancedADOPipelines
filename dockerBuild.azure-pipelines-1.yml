@@ -13,7 +13,7 @@ variables:
   dockerRegistryServiceConnection: '0940bbe7-80f0-4adc-b61f-565986235d5d'
   imageRepository: 'schoolprojectdb'
   containerRegistry: 'dbbuilddemo.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
+  dockerfilePath: '$(Pipeline.Workspace)/3Docker/dockerfile'
   tag: '$(Build.BuildId)'
   
   # Agent VM image name
@@ -28,6 +28,12 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: PowerShell@2
+      displayName: 'DirectoryList'
+      inputs:
+        targetType: 'inline'
+        script: |
+          dir -s
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
