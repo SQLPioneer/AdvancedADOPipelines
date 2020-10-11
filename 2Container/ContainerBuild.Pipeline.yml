@@ -74,6 +74,10 @@ stages:
       displayName: "List docker images"
       inputs:
         script: 'docker ps -all'
+    - task: CmdLine@2
+      displayName: "Show docker logs"
+      inputs:
+        script: 'docker logs $(MSSQLSERVICE)'
     - task: PowerShell@2
       displayName: 'Sleep'
       inputs:
@@ -81,10 +85,6 @@ stages:
         script: |
           dir -s
           start-sleep -s 60
-    - task: CmdLine@2
-      displayName: "Show docker logs"
-      inputs:
-        script: 'docker logs $(SAPASSWORD)'
     - task: CmdLine@2
       displayName: "Connect to SQLServer and Query version" 
       inputs:
