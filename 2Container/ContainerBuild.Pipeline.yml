@@ -85,17 +85,3 @@ stages:
       displayName: "Connect to SQLServer and Query SchoolProject DB" 
       inputs:
         script: 'sqlcmd -S localhost -d SchoolProject -U sa -P $(saPassword) -Q "SELECT @@ServerName as ServerName, DB_NAME() AS CurrentDB;"' 
-    - task: SqlDacpacDeploymentOnMachineGroup@0
-      inputs:
-        TaskType: 'dacpac'
-        DacpacFile: '$(Pipeline.Workspace)/1Basic/SchoolProjectDB/SchoolProject.dacpac'
-        TargetMethod: 'server'
-        ServerName: 'localhost'
-        DatabaseName: 'SchoolProject1'
-        AuthScheme: 'sqlServerAuthentication'
-        SqlUsername: 'sa'
-        SqlPassword: '$(saPassword)'
-    - task: CmdLine@2
-      displayName: "Connect to SQLServer and Query SchoolProject DB" 
-      inputs:
-        script: 'sqlcmd -S localhost -d SchoolProject1 -U sa -P $(saPassword) -Q "SELECT @@ServerName as ServerName, DB_NAME() AS CurrentDB;"' 
