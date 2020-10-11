@@ -48,7 +48,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     services:
-      mssql: mssql2017
+      mssql2017: mssql2017
     steps:
     - download: 1Basic
     - task: Bash@3
@@ -78,7 +78,7 @@ stages:
     - task: CmdLine@2
       displayName: "Show docker logs"
       inputs:
-        script: 'docker logs mssql'
+        script: 'docker logs mssql2017'
     - task: CmdLine@2
       displayName: "Connect to SQLServer and Query version" 
       inputs:
