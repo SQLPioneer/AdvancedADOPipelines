@@ -49,5 +49,6 @@ stages:
         repository: '$(imageRepository)'
         command: 'build'
         Dockerfile: '$(dockerfilePath)'
+        buildContext: '$(Pipeline.Workspace)/s/3Docker/'
         tags: '$(tag)'
-        arguments: 'PASSWORD=$(password)'
+        arguments: '--build-arg PASSWORD=$(password)'
