@@ -42,13 +42,19 @@ variables:
 stages:
 - stage: deployToContainer
   jobs:
-  - job: unit_test_db_mssql
+  - job: DeployDacpacInContainer
     # condition: eq('${{ variables.runDbTests }}', 'true')
+    strategy:
+     matrix:
+       mssql2017:
+         mssqlService: mssql2017
+       mssql2019:
+         mssqlService: mssql2019
     continueOnError: true
     pool:
       vmImage: 'ubuntu-latest'
     services:
-      mssql2017: mssql2017
+      mssql: $[ variables['mssqlService'] ]
     steps:
     - download: 1Basic
     - task: Bash@3
