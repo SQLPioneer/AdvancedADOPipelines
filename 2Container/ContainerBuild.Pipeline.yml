@@ -13,7 +13,7 @@ resources:
     ports: 
       - 1433:1433
     options: --name mssql2017
-    - container: mssql2019
+  - container: mssql2019
     image: mcr.microsoft.com/mssql/server:2019-latest
     env:
       ACCEPT_EULA: Y
@@ -22,8 +22,6 @@ resources:
     ports: 
       - 1433:1433
     options: --name mssql2019
-  - container: test
-    image 
   pipelines:
     - pipeline: 1Basic
       source: SQLPioneer.PipelineDemo.1Basic
