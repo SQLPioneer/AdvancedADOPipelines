@@ -21,7 +21,7 @@ variables:
   dockerRegistryServiceConnection: '0940bbe7-80f0-4adc-b61f-565986235d5d'
   imageRepository: 'schoolprojectdb'
   containerRegistry: 'dbbuilddemo.azurecr.io'
-  dockerfilePath: '$(Pipeline.Workspace)/3Docker/dockerfile'
+  dockerfilePath: '$(Pipeline.Workspace)/s/3Docker/dockerfile'
   tag: '$(Build.BuildId)'
   
   # Agent VM image name
