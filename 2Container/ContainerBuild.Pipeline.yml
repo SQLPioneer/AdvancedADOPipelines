@@ -84,7 +84,7 @@ stages:
     - task: CmdLine@2
       displayName: "Show docker logs"
       inputs:
-        script: 'docker logs %SAPASSWORD%'
+        script: 'docker logs $(SAPASSWORD)'
     - task: CmdLine@2
       displayName: "Connect to SQLServer and Query version" 
       inputs:
