@@ -13,7 +13,7 @@ resources:
     ports: 
       - 1433:1433
     options: --name mssql2017
-    - container: mssql2019
+  - container: mssql2019
     image: mcr.microsoft.com/mssql/server:2019-latest
     env:
       ACCEPT_EULA: Y
@@ -22,8 +22,6 @@ resources:
     ports: 
       - 1433:1433
     options: --name mssql2019
-  - container: test
-    image 
   pipelines:
     - pipeline: 1Basic
       source: SQLPioneer.PipelineDemo.1Basic
@@ -44,13 +42,19 @@ variables:
 stages:
 - stage: deployToContainer
   jobs:
-  - job: unit_test_db_mssql
+  - job: DeployDacpacInContainer
     # condition: eq('${{ variables.runDbTests }}', 'true')
+    strategy:
+     matrix:
+       mssql2017:
+         mssqlService: mssql2017
+       mssql2019:
+         mssqlService: mssql2019
     continueOnError: true
     pool:
       vmImage: 'ubuntu-latest'
     services:
-      mssql: mssql2017
+      mssql: $[ variables['mssqlService'] ]
     steps:
     - download: 1Basic
     - task: Bash@3
@@ -70,6 +74,10 @@ stages:
       displayName: "List docker images"
       inputs:
         script: 'docker ps -all'
+    - task: CmdLine@2
+      displayName: "Show docker logs"
+      inputs:
+        script: 'docker logs $(MSSQLSERVICE)'
     - task: PowerShell@2
       displayName: 'Sleep'
       inputs:
@@ -77,10 +85,6 @@ stages:
         script: |
           dir -s
           start-sleep -s 60
-    - task: CmdLine@2
-      displayName: "Show docker logs"
-      inputs:
-        script: 'docker logs mssql'
     - task: CmdLine@2
       displayName: "Connect to SQLServer and Query version" 
       inputs:
