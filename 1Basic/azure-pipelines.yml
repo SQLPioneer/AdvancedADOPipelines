@@ -48,3 +48,9 @@ stages:
         PathtoPublish: '$(Build.SourcesDirectory)/1Basic/SchoolProject/bin/Release/'
         ArtifactName: 'SchoolProjectDB'
         publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      displayName: PublishTests
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/1Basic/SchoolProject.Tests.cs/bin/Release/'
+        ArtifactName: 'SchoolProjectDB.Tests'
+        publishLocation: 'Container'
