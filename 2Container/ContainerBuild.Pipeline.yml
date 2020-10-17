@@ -50,9 +50,9 @@ stages:
     strategy:
      matrix:
        SQLServer2017:
-         mssqlService: mssql2017Container
+         mssqlService: mssql2017
        SQLServer2019:
-         mssqlService: mssql2019Container
+         mssqlService: mssql2019
     continueOnError: true
     pool:
       vmImage: 'ubuntu-latest'
