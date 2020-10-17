@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 resources:
   containers:
-  - container: mssql2017Container
+  - container: mssql2017
     image: mcr.microsoft.com/mssql/server:2017-latest
     env:
       ACCEPT_EULA: Y
@@ -13,7 +13,7 @@ resources:
     ports: 
       - 1433:1433
     options: --name mssql2017
-  - container: mssql2019Container
+  - container: mssql2019
     image: mcr.microsoft.com/mssql/server:2019-latest
     env:
       ACCEPT_EULA: Y
