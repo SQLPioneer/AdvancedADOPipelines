@@ -61,15 +61,15 @@ stages:
 
     steps:
     - download: 1Basic
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 3.1.x'
-      inputs:
-        version: 3.1.x
-    - task: DotNetCoreCLI@2
-      displayName: Restore
-      inputs:
-        command: restore
-        projects: '$(RestoreBuildProjects)'
+    # - task: UseDotNet@2
+    #   displayName: 'Use .Net Core sdk 3.1.x'
+    #   inputs:
+    #     version: 3.1.x
+    # - task: DotNetCoreCLI@2
+    #   displayName: Restore
+    #   inputs:
+    #     command: restore
+    #     projects: '$(RestoreBuildProjects)'
     - task: Bash@3
       displayName: "Install sqlpackage"
       inputs:
@@ -113,9 +113,9 @@ stages:
       displayName: "Connect to SQLServer and Query SchoolProject DB" 
       inputs:
         script: 'sqlcmd -S localhost -d SchoolProject -U sa -P $(saPassword) -Q "SELECT @@ServerName as ServerName, DB_NAME() AS CurrentDB;"' 
-    - task: DotNetCoreCLI@2
-      displayName: Test
-      inputs:
-        command: test
-        projects: '**/*[Tt]ests/*.csproj'
-        arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Test
+    #   inputs:
+    #     command: test
+    #     projects: '**/*[Tt]ests/*.csproj'
+    #     arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
