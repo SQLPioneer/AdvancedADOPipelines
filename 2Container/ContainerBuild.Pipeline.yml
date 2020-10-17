@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 resources:
   containers:
-  - container: mssql2017
+  - container: mssql2017Container
     image: mcr.microsoft.com/mssql/server:2017-latest
     env:
       ACCEPT_EULA: Y
@@ -13,7 +13,7 @@ resources:
     ports: 
       - 1433:1433
     options: --name mssql2017
-  - container: mssql2019
+  - container: mssql2019Container
     image: mcr.microsoft.com/mssql/server:2019-latest
     env:
       ACCEPT_EULA: Y
@@ -49,10 +49,10 @@ stages:
     # condition: eq('${{ variables.runDbTests }}', 'true')
     strategy:
      matrix:
-       sql17:
-         mssqlService: mssql2017
-       sql19:
-         mssqlService: mssql2019
+       SQLServer2017:
+         mssqlService: mssql2017Container
+       SQLServer2019:
+         mssqlService: mssql2019Container
     continueOnError: true
     pool:
       vmImage: 'ubuntu-latest'
