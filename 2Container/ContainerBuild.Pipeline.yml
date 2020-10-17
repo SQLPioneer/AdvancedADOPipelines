@@ -49,9 +49,9 @@ stages:
     # condition: eq('${{ variables.runDbTests }}', 'true')
     strategy:
      matrix:
-       mssql2017:
+       sql17:
          mssqlService: mssql2017
-       mssql2019:
+       sql19:
          mssqlService: mssql2019
     continueOnError: true
     pool:
