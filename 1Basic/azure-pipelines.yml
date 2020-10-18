@@ -63,9 +63,10 @@ stages:
   dependsOn: BuildStage 
   jobs:
   - deployment: DeploytoDev1
-    displayName: 
+    displayName: 'Deploy to Dev1'
     environment:
       name: Dev1 
+      resourceType: VirtualMachine
     strategy:
       runOnce:
        deploy:
