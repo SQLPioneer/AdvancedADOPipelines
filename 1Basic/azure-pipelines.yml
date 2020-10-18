@@ -18,11 +18,11 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-pool:
-  vmImage: 'windows-latest'
 
 stages:
 - stage: BuildStage
+  pool:
+    vmImage: 'windows-latest'
   jobs:
   - job: BuildJob
     steps:
