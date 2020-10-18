@@ -4,6 +4,9 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
+  branches:
+   include:
+     - master
   paths:
     include:
       - 1Basic/*
@@ -15,12 +18,13 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
+pool:
+  vmImage: 'windows-latest'
+
 stages:
-- stage: DBBuild
-  pool:
-   vmImage: 'windows-latest'
+- stage: BuildStage
   jobs:
-  - job: Build
+  - job: BuildJob
     steps:
     - task: NuGetToolInstaller@1
     - task: NuGetCommand@2
@@ -54,3 +58,27 @@ stages:
         PathtoPublish: '$(Build.SourcesDirectory)/1Basic/SchoolProject.Tests.cs/bin/Release/'
         ArtifactName: 'SchoolProjectDB.Tests'
         publishLocation: 'Container'
+
+- stage: DeployToDev1
+  dependsOn: BuildStage 
+  jobs:
+  - deployment: DeploytoDev1
+    displayName: 
+    environment:
+      name: Dev1
+      resourceId: 
+    strategy:
+      runOnce:
+       deploy:
+         steps:
+          - task: SqlDacpacDeploymentOnMachineGroup@0
+            inputs:
+              TaskType: 'dacpac'
+              DacpacFile: '$(Build.SourcesDirectory)/1Basic/SchoolProject/bin/Release/SchoolProject.dacpac'
+              TargetMethod: 'server'
+              ServerName: 'localhost'
+              DatabaseName: 'SchoolProject'
+              AuthScheme: 'sqlServerAuthentication'
+              SqlUsername: 'sa'
+              SqlPassword: '$(saPassword)'
+        
