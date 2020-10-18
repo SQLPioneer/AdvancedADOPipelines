@@ -81,7 +81,7 @@ stages:
           - task: SqlDacpacDeploymentOnMachineGroup@0
             inputs:
               TaskType: 'dacpac'
-              DacpacFile: '$(System.ArtifactsDirectory)/SchoolProject/SchoolProject.dacpac'
+              DacpacFile: '$(System.ArtifactsDirectory)/SchoolProjectDB/SchoolProject.dacpac'
               TargetMethod: 'server'
               ServerName: 'localhost'
               DatabaseName: 'SchoolProject'
