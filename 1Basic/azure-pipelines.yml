@@ -71,17 +71,17 @@ stages:
       runOnce:
        deploy:
          steps:
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: 'current'
-              downloadType: 'specific'
-              itemPattern: '**/SchoolProject.dacpac'
-              downloadPath: '$(System.ArtifactsDirectory)'
+          # - task: DownloadBuildArtifacts@0
+          #   inputs:
+          #     buildType: 'current'
+          #     downloadType: 'specific'
+          #     itemPattern: '**/SchoolProject.dacpac'
+          #     downloadPath: '$(System.ArtifactsDirectory)'
           - powershell: dir -s
           - task: SqlDacpacDeploymentOnMachineGroup@0
             inputs:
               TaskType: 'dacpac'
-              DacpacFile: '$(System.ArtifactsDirectory)/SchoolProjectDB/SchoolProject.dacpac'
+              DacpacFile: '$(Pipeline.Workspace)/SchoolProjectDB/SchoolProject.dacpac'
               TargetMethod: 'server'
               ServerName: 'localhost'
               DatabaseName: 'SchoolProject'
