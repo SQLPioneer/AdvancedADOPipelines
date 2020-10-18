@@ -65,8 +65,7 @@ stages:
   - deployment: DeploytoDev1
     displayName: 
     environment:
-      name: Dev1
-      resourceId: 
+      name: Dev1 
     strategy:
       runOnce:
        deploy:
