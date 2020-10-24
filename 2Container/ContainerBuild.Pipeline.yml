@@ -25,6 +25,9 @@ resources:
   pipelines:
     - pipeline: 1Basic
       source: SQLPioneer.PipelineDemo.1Basic
+      trigger:
+        branches:
+        - *
 
 trigger:
   paths:
