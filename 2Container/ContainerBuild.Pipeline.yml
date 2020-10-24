@@ -27,7 +27,7 @@ resources:
       source: SQLPioneer.PipelineDemo.1Basic
       trigger:
         branches:
-        - *
+        - master
 
 trigger:
   paths:
