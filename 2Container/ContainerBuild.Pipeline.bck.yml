@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 resources:
   containers:
-  - container: mssql2017
+  - container: mssql
     image: mcr.microsoft.com/mssql/server:2017-latest
     env:
       ACCEPT_EULA: Y
@@ -12,16 +12,7 @@ resources:
       MSSQL_PID: Express
     ports: 
       - 1433:1433
-    options: --name mssql2017
-  - container: mssql2019
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    env:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: $(saPassword)
-      MSSQL_PID: Express
-    ports: 
-      - 1433:1433
-    options: --name mssql2019
+    options: --name mssql
   pipelines:
     - pipeline: 1Basic
       source: SQLPioneer.PipelineDemo.1Basic
@@ -39,37 +30,18 @@ variables:
   value: SchoolProject
 - name: debug
   value: true
-- name: BuildConfiguration
-  value: 'Release'
-
 stages:
 - stage: deployToContainer
   jobs:
-  - job: DeployDacpacInContainer
+  - job: unit_test_db_mssql
     # condition: eq('${{ variables.runDbTests }}', 'true')
-    strategy:
-     matrix:
-       SQLServer2017:
-         mssqlService: mssql2017
-       SQLServer2019:
-         mssqlService: mssql2019
     continueOnError: true
     pool:
       vmImage: 'ubuntu-latest'
     services:
-      mssql: $[ variables['mssqlService'] ]
-
+      mssql: mssql
     steps:
     - download: 1Basic
-    # - task: UseDotNet@2
-    #   displayName: 'Use .Net Core sdk 3.1.x'
-    #   inputs:
-    #     version: 3.1.x
-    # - task: DotNetCoreCLI@2
-    #   displayName: Restore
-    #   inputs:
-    #     command: restore
-    #     projects: '$(RestoreBuildProjects)'
     - task: Bash@3
       displayName: "Install sqlpackage"
       inputs:
@@ -87,10 +59,6 @@ stages:
       displayName: "List docker images"
       inputs:
         script: 'docker ps -all'
-    - task: CmdLine@2
-      displayName: "Show docker logs"
-      inputs:
-        script: 'docker logs $(MSSQLSERVICE)'
     - task: PowerShell@2
       displayName: 'Sleep'
       inputs:
@@ -98,6 +66,10 @@ stages:
         script: |
           dir -s
           start-sleep -s 60
+    - task: CmdLine@2
+      displayName: "Show docker logs"
+      inputs:
+        script: 'docker logs mssql'
     - task: CmdLine@2
       displayName: "Connect to SQLServer and Query version" 
       inputs:
@@ -113,9 +85,3 @@ stages:
       displayName: "Connect to SQLServer and Query SchoolProject DB" 
       inputs:
         script: 'sqlcmd -S localhost -d SchoolProject -U sa -P $(saPassword) -Q "SELECT @@ServerName as ServerName, DB_NAME() AS CurrentDB;"' 
-    # - task: DotNetCoreCLI@2
-    #   displayName: Test
-    #   inputs:
-    #     command: test
-    #     projects: '**/*[Tt]ests/*.csproj'
-    #     arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'

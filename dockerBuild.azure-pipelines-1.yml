@@ -3,7 +3,15 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- master
+  branches:
+   include:
+     - master
+  paths:
+    include:
+      - 3Docker/*
+    exclude:
+      - 1Basic/*
+      - 2Container/*
 
 resources:
 - repo: self
@@ -13,7 +21,7 @@ variables:
   dockerRegistryServiceConnection: '0940bbe7-80f0-4adc-b61f-565986235d5d'
   imageRepository: 'schoolprojectdb'
   containerRegistry: 'dbbuilddemo.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
+  dockerfilePath: '$(Pipeline.Workspace)/s/3Docker/dockerfile'
   tag: '$(Build.BuildId)'
   
   # Agent VM image name
@@ -28,12 +36,19 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: PowerShell@2
+      displayName: 'DirectoryList'
+      inputs:
+        targetType: 'inline'
+        script: |
+          dir -s
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+        containerRegistry: '$(dockerRegistryServiceConnection)'
+        repository: '$(imageRepository)'
+        command: 'build'
+        Dockerfile: '$(dockerfilePath)'
+        buildContext: '$(Pipeline.Workspace)/s/3Docker/'
+        tags: '$(tag)'
+        arguments: '--build-arg PASSWORD=$(password)'

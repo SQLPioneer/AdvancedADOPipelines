@@ -4,6 +4,9 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
+  branches:
+   include:
+     - master
   paths:
     include:
       - 1Basic/*
@@ -15,12 +18,13 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
+
 stages:
-- stage: DBBuild
+- stage: BuildStage
   pool:
-   vmImage: 'windows-latest'
+    vmImage: 'windows-latest'
   jobs:
-  - job: Build
+  - job: BuildJob
     steps:
     - task: NuGetToolInstaller@1
     - task: NuGetCommand@2
@@ -48,3 +52,40 @@ stages:
         PathtoPublish: '$(Build.SourcesDirectory)/1Basic/SchoolProject/bin/Release/'
         ArtifactName: 'SchoolProjectDB'
         publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      displayName: PublishTests
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/1Basic/SchoolProject.Tests.cs/bin/Release/'
+        ArtifactName: 'SchoolProjectDB.Tests'
+        publishLocation: 'Container'
+
+- stage: DeployToDev1
+  dependsOn: BuildStage 
+  jobs:
+  - deployment: DeploytoDev1
+    displayName: 'Deploy to Dev1'
+    environment:
+      name: Dev1 
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+       deploy:
+         steps:
+          # - task: DownloadBuildArtifacts@0
+          #   inputs:
+          #     buildType: 'current'
+          #     downloadType: 'specific'
+          #     itemPattern: '**/SchoolProject.dacpac'
+          #     downloadPath: '$(System.ArtifactsDirectory)'
+          - powershell: dir -s
+          - task: SqlDacpacDeploymentOnMachineGroup@0
+            inputs:
+              TaskType: 'dacpac'
+              DacpacFile: '$(Pipeline.Workspace)/SchoolProjectDB/SchoolProject.dacpac'
+              TargetMethod: 'server'
+              ServerName: 'localhost'
+              DatabaseName: 'SchoolProject'
+              AuthScheme: 'sqlServerAuthentication'
+              SqlUsername: 'sa'
+              SqlPassword: '$(saPassword)'
+        

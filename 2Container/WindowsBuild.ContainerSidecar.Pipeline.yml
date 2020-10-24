@@ -1,0 +1,78 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+resources:
+  containers:
+  - container: mssql
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    env:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: $(saPassword)
+      MSSQL_PID: Express
+    ports: 
+      - 1433:1433
+    options: --name mssql
+  pipelines:
+    - pipeline: 1Basic
+      source: SQLPioneer.PipelineDemo.1Basic
+
+trigger:
+  paths:
+    include:
+      - 2Container/*
+    exclude:
+      - 1Basic/*
+      - 3Docker/*
+variables:
+- name: DAC
+  value: SchoolProject\SchoolProject.dacpac
+- name: DBNAME
+  value: SchoolProject
+- name: debug
+  value: true
+stages:
+- stage: deployToContainer
+  jobs:
+  - job: unit_test_db_mssql
+    # condition: eq('${{ variables.runDbTests }}', 'true')
+    continueOnError: true
+    pool:
+      vmImage: 'windows-latest'
+    services:
+      mssql: mssql
+    steps:
+    - download: 1Basic
+    - task: CmdLine@2
+      displayName: "List docker images"
+      inputs:
+        script: 'docker ps -all'
+    - task: PowerShell@2
+      displayName: 'Sleep'
+      inputs:
+        targetType: 'inline'
+        script: |
+          dir -s
+          start-sleep -s 60
+    - task: CmdLine@2
+      displayName: "Show docker logs"
+      inputs:
+        script: 'docker logs mssql'
+    - task: SqlDacpacDeploymentOnMachineGroup@0
+      inputs:
+        TaskType: 'dacpac'
+        DacpacFile: '$(Pipeline.Workspace)/1Basic/SchoolProjectDB/SchoolProject.dacpac'
+        TargetMethod: 'server'
+        ServerName: 'localhost'
+        DatabaseName: 'SchoolProject'
+        AuthScheme: 'sqlServerAuthentication'
+        SqlUsername: 'sa'
+        SqlPassword: '$(saPassword)'
+      - task: CmdLine@2
+      displayName: "Connect to SQLServer and Query version" 
+      inputs:
+        script: 'sqlcmd -S localhost -d master -U sa -P $(saPassword) -Q "SELECT @@version;"'
+      - task: CmdLine@2
+      displayName: "Connect to SQLServer and Query SchoolProject DB" 
+      inputs:
+        script: 'sqlcmd -S localhost -d SchoolProject -U sa -P $(saPassword) -Q "SELECT @@ServerName as ServerName, DB_NAME() AS CurrentDB;"' 
